@@ -1,0 +1,4 @@
+[server]
+headless = true          # Ejecuta la app sin abrir una ventana del navegador
+port = 8501              # El puerto donde se ejecutará la app
+address = "0.0.0.0"      # Permite que sea accesible desde otras máquinas (no solo localhost)
