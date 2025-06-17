@@ -1,49 +1,41 @@
 import streamlit as st
 import pandas as pd
 
-# Fondo personalizado
-st.markdown("""
-    <style>
-    .stApp {
-        background-image: url('https://raw.githubusercontent.com/mesiast01/MESIAS/main/fondo_eswaju.png');
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        color: #fdfdfd;
-    }
-    .title-text {
-        font-size: 36px;
-        font-weight: bold;
-        color: #ffffff;
-        text-align: center;
-    }
-    .sub-text {
-        font-size: 18px;
-        color: #eeeeee;
-        text-align: center;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# Establecer fondo e imagen de logo
+def set_background_and_logo():
+    st.markdown("""
+        <style>
+            .stApp {
+                background-image: url("https://raw.githubusercontent.com/mesiast01/MESIAS/main/fondo_eswaju.png");
+                background-size: cover;
+                background-attachment: fixed;
+            }
+            .title {
+                font-size: 30px;
+                font-weight: bold;
+                color: #ffffff;
+                text-shadow: 2px 2px 4px #000000;
+                text-align: center;
+                margin-top: -20px;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
-# Mostrar logo centrado
-st.markdown("""
-    <div style="text-align: center;">
-        <img src="https://raw.githubusercontent.com/mesiast01/MESIAS/main/logo_eswaju.png" alt="Logo ESWAJU" width="150">
-    </div>
-""", unsafe_allow_html=True)
+    st.image("https://raw.githubusercontent.com/mesiast01/MESIAS/main/logo_eswaju.png", width=160)
+    st.markdown("<div class='title'>📘 Traductor ESWAJU: Awajún / Wampis – Español</div>", unsafe_allow_html=True)
 
-# Título principal
-st.markdown('<div class="title-text">📘 Traductor ESWAJU: Awajún / Wampis – Español</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-text">Herramienta de traducción intercultural basada en lenguas originarias</div><br>', unsafe_allow_html=True)
-
-# Cargar datos
+# Cargar datos desde CSV
 @st.cache_data
 def cargar_datos():
     df = pd.read_csv("diccionario.csv")
     df.columns = df.columns.str.strip().str.lower()
     return df
 
+set_background_and_logo()
 df = cargar_datos()
+
+# Descripción
+st.markdown("Herramienta de traducción intercultural basada en lenguas originarias")
 
 # Selección de idioma
 idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
@@ -51,10 +43,9 @@ idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wamp
 # Modo de traducción
 modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
 
-# Entrada
+# Entrada de palabra
 palabra = st.text_input("🔤 Ingresa una palabra:")
 
-# Procesar traducción
 if palabra:
     palabra_busqueda = palabra.strip().lower()
     idioma_key = "awajun" if idioma == "Awajún" else "wampis"
@@ -67,12 +58,17 @@ if palabra:
         columna_destino = "espanol"
 
     if columna_origen in df.columns and columna_destino in df.columns:
-        resultado = df[df[columna_origen].str.lower() == palabra_busqueda]
-        if not resultado.empty:
-            traduccion = resultado.iloc[0][columna_destino]
-            st.success(f"🔁 Traducción: {traduccion}")
-        else:
-            st.warning("❌ Palabra no encontrada en el diccionario.")
+        try:
+            resultado = df[df[columna_origen].str.lower() == palabra_busqueda]
+            if not resultado.empty:
+                traduccion = resultado.iloc[0][columna_destino]
+                # 🔵 Texto de resultado más grande y colorido
+                st.markdown(f"<h3 style='color:#00ffcc;'>🔁 Traducción: {traduccion}</h3>", unsafe_allow_html=True)
+            else:
+                st.warning("❌ Palabra no encontrada en el diccionario.")
+        except Exception as e:
+            st.error(f"⚠️ Error al buscar la palabra: {e}")
     else:
         st.error(f"❌ Columnas no válidas en el CSV: {columna_origen} o {columna_destino}")
+
 
