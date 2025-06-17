@@ -1,65 +1,56 @@
 import streamlit as st
 import pandas as pd
 
-# ✅ Cambia estas URLs por las tuyas exactas si son diferentes
+# URLs directas
 FONDO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/fondo_eswaju.png"
 LOGO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/logo_eswaju.png"
 
-# 🖼️ Estilo personalizado con fondo y logo
-def set_background_and_logo():
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url("{FONDO_URL}");
-            background-size: cover;
-            background-attachment: fixed;
-        }}
-        .title {{
-            font-size: 32px;
-            font-weight: bold;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px #000000;
-            text-align: center;
-            margin-top: -20px;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-    st.image(LOGO_URL, width=160)
-    st.markdown("<div class='title'>📘 Traductor ESWAJU: Awajún / Wampis – Español</div>", unsafe_allow_html=True)
+# Estilos y logo
+st.markdown(
+    f"""
+    <style>
+    .stApp {{
+        background-image: url("{FONDO_URL}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }}
+    .title {{
+        font-size: 32px;
+        font-weight: bold;
+        color: #ffffff;
+        text-shadow: 2px 2px 4px #000000;
+        text-align: center;
+        margin-top: -20px;
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+st.markdown(f'<div style="text-align:center;"><img src="{LOGO_URL}" width="150"></div>', unsafe_allow_html=True)
+st.markdown('<div class="title">📘 Traductor ESWAJU: Awajún / Wampis – Español</div>', unsafe_allow_html=True)
 
-# 📥 Cargar CSV
+# Carga de datos
 @st.cache_data
 def cargar_datos():
     df = pd.read_csv("diccionario.csv")
     df.columns = df.columns.str.strip().str.lower()
     return df
 
-# 🧠 Ejecutar funciones
-set_background_and_logo()
 df = cargar_datos()
 
-# 🌍 Selección de idioma
+# Interfaz
+st.markdown("\n")  # Separador visual
 idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
-
-# 🔄 Modo de traducción
 modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
-
-# 🔤 Entrada de palabra
 palabra = st.text_input("🔤 Ingresa una palabra:")
 
+# Lógica de traducción
 if palabra:
     palabra_busqueda = palabra.strip().lower()
     idioma_key = "awajun" if idioma == "Awajún" else "wampis"
-
-    if modo == "Español → Lengua originaria":
-        columna_origen = "espanol"
-        columna_destino = idioma_key
-    else:
-        columna_origen = idioma_key
-        columna_destino = "espanol"
+    columna_origen = "espanol" if "Español" in modo else idioma_key
+    columna_destino = idioma_key if "Español" in modo else "espanol"
 
     if columna_origen in df.columns and columna_destino in df.columns:
         resultado = df[df[columna_origen].str.lower() == palabra_busqueda]
