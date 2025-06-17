@@ -1,34 +1,54 @@
 import streamlit as st
 import pandas as pd
 
-# Cargar los datos desde el CSV
+# Cargar datos desde el CSV
 @st.cache_data
 def cargar_datos():
     df = pd.read_csv("diccionario.csv")
-    df.columns = df.columns.str.strip().str.lower()  # normaliza nombres de columnas
+    df.columns = df.columns.str.strip().str.lower()
     return df
 
 df = cargar_datos()
 
-# Ver columnas reales (solo para depurar)
-# st.write("Columnas detectadas:", df.columns.tolist())
+# Estilos de fondo y fuente
+st.markdown("""
+    <style>
+    .stApp {
+        background-image: url('https://raw.githubusercontent.com/mesiast01/MESIAS/main/fondo_eswaju.png');  /* cambia por tu ruta si está local */
+        background-size: cover;
+        background-attachment: fixed;
+        font-family: 'Segoe UI', sans-serif;
+        color: #2F2F2F;
+    }
+    h1, .title {
+        color: #8B0000;
+    }
+    .big-text {
+        font-size: 25px;
+        font-weight: bold;
+        color: #8B0000;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Mostrar logo en la parte superior
+st.image("logo_eswaju.png", width=180)  # Asegúrate que el logo esté en el mismo directorio o usa ruta completa
 
 # Título principal
-st.markdown("📘 **Traductor ESWAJU: Awajún / Wampis – Español**")
+st.markdown('<p class="big-text">📘 Traductor ESWAJU: Awajún / Wampis – Español</p>', unsafe_allow_html=True)
 
 # Selección de idioma
-idioma = st.selectbox("Selecciona el idioma de destino:", ["Awajún", "Wampis"])
+idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
 
 # Modo de traducción
-modo = st.radio("Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
+modo = st.radio("⚙️ Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
 
 # Entrada de palabra
 palabra = st.text_input("🔤 Ingresa una palabra:")
 
+# Lógica de traducción
 if palabra:
     palabra_busqueda = palabra.strip().lower()
-
-    # Convertir idioma visual a clave de columna
     idioma_key = "awajun" if idioma == "Awajún" else "wampis"
 
     if modo == "Español → Lengua originaria":
@@ -38,7 +58,6 @@ if palabra:
         columna_origen = idioma_key
         columna_destino = "espanol"
 
-    # Validar si las columnas existen antes de acceder
     if columna_origen in df.columns and columna_destino in df.columns:
         try:
             resultado = df[df[columna_origen].str.lower() == palabra_busqueda]
