@@ -28,10 +28,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Logo centrado (corregido)
+# Logo centrado
 st.markdown(f'<div style="text-align:center;"><img src="{LOGOTIPO_URL}" width="150"></div>', unsafe_allow_html=True)
 
-# Título
+# Título centrado
 st.markdown('<div class="title">📘 Traductor ESWAJU: Awajún / Wampis – Español</div>', unsafe_allow_html=True)
 
 # Cargar CSV
