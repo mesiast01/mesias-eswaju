@@ -66,7 +66,7 @@ if palabra:
         resultado = df[df[columna_origen].str.lower() == palabra_busqueda]
         if not resultado.empty:
             traduccion = resultado.iloc[0][columna_destino]
-            st.markdown(f"<h3 style='color:#00ffcc;'>🔁 Traducción: {traduccion}</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='color:#000000;'>🔁 Traducción: {traduccion}</h3>", unsafe_allow_html=True)
         else:
             st.warning("❌ Palabra no encontrada en el diccionario.")
     else:
