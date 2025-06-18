@@ -1,16 +1,20 @@
 import streamlit as st
 import pandas as pd
+import base64
+from PIL import Image
 
-# URLs directas
-FONDO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/fondo_eswaju.png"
-LOGO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/logo_eswaju.png"
+# Función para convertir imagen a base64
+def imagen_a_base64(ruta):
+    with open(ruta, "rb") as f:
+        return base64.b64encode(f.read()).decode()
 
-# Estilos y logo
+# Establecer fondo desde imagen local convertida a base64
+fondo_base64 = imagen_a_base64("fondo_eswaju.png")
 st.markdown(
     f"""
     <style>
     .stApp {{
-        background-image: url("{FONDO_URL}");
+        background-image: url("data:image/png;base64,{fondo_base64}");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -27,10 +31,15 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-st.markdown(f'<div style="text-align:center;"><img src="{LOGO_URL}" width="150"></div>', unsafe_allow_html=True)
+
+# Mostrar logo local
+logo = Image.open("logo_eswaju.png")
+st.image(logo, width=150)
+
+# Título
 st.markdown('<div class="title">📘 Traductor ESWAJU: Awajún / Wampis – Español</div>', unsafe_allow_html=True)
 
-# Carga de datos
+# Cargar diccionario
 @st.cache_data
 def cargar_datos():
     df = pd.read_csv("diccionario.csv")
@@ -40,7 +49,7 @@ def cargar_datos():
 df = cargar_datos()
 
 # Interfaz
-st.markdown("\n")  # Separador visual
+st.markdown("\n")  # Espacio
 idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
 modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
 palabra = st.text_input("🔤 Ingresa una palabra:")
