@@ -3,7 +3,8 @@ import pandas as pd
 
 # Rutas desde GitHub
 FONDO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/fondo_eswaju.png"
-LOGO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/logotipo_eswaju.png"
+LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/logotipo_eswaju.png"
+
 
 # Fondo con CSS
 st.markdown(
