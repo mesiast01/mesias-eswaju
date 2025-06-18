@@ -5,8 +5,6 @@ import pandas as pd
 FONDO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/fondo_eswaju.png"
 LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/logotipo_eswaju.png"
 
-
-
 # Fondo con CSS
 st.markdown(
     f"""
@@ -23,15 +21,22 @@ st.markdown(
         color: #ffffff;
         text-shadow: 2px 2px 4px #000000;
         text-align: center;
-        margin-top: -20px;
+        margin-top: 10px;
     }}
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# Logo desde URL
-st.markdown(f'<div style="text-align:center;"><img src="{LOGOTIPO_URL}" width="150"></div>', unsafe_allow_html=True)
+# Logo centrado con espacio inferior
+st.markdown(
+    f'''
+    <div style="text-align:center; margin-top:20px; margin-bottom:30px;">
+        <img src="{LOGOTIPO_URL}" width="150">
+    </div>
+    ''',
+    unsafe_allow_html=True
+)
 
 # Título
 st.markdown('<div class="title">📘 Traductor ESWAJU: Awajún / Wampis – Español</div>', unsafe_allow_html=True)
