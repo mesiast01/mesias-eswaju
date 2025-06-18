@@ -54,6 +54,7 @@ if authentication_status is False or authentication_status is None:
                 with open('config.yaml', 'w') as file:
                     yaml.dump(config, file, default_flow_style=False)
                 st.success("✅ Registrado exitosamente. Ahora inicia sesión.")
+                st.experimental_rerun()
             else:
                 st.error("❌ Por favor, completa todos los campos.")
 
@@ -135,6 +136,7 @@ if authentication_status:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
         else:
             st.error(f"❌ Columnas no válidas en el CSV: {columna_origen} o {columna_destino}")
+
 
 
 
