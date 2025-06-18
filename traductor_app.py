@@ -21,22 +21,18 @@ st.markdown(
         color: #ffffff;
         text-shadow: 2px 2px 4px #000000;
         text-align: center;
-        margin-top: 30px;
-        margin-bottom: 20px;
+        margin-top: 10px;
     }}
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# Espaciado antes del logo
-st.markdown("<br><br>", unsafe_allow_html=True)
-
-# Logo centrado con más espacio alrededor
+# Logo centrado con espacio inferior
 st.markdown(
     f'''
-    <div style="text-align:center; margin-top:40px; margin-bottom:50px;">
-        <img src="{LOGOTIPO_URL}" width="160">
+    <div style="text-align:center; margin-top:20px; margin-bottom:30px;">
+        <img src="{LOGOTIPO_URL}" width="150">
     </div>
     ''',
     unsafe_allow_html=True
@@ -75,6 +71,7 @@ if palabra:
             st.warning("❌ Palabra no encontrada en el diccionario.")
     else:
         st.error(f"❌ Columnas no válidas en el CSV: {columna_origen} o {columna_destino}")
+
 
 
 
