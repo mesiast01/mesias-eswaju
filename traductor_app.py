@@ -33,8 +33,8 @@ st.markdown(
 )
 
 # Mostrar logo local
-logo = Image.open("logo_eswaju.png")
-st.image(logo, width=150)
+LOGO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/logo_eswaju.png"
+st.image(LOGO_URL, width=150)
 
 # Título
 st.markdown('<div class="title">📘 Traductor ESWAJU: Awajún / Wampis – Español</div>', unsafe_allow_html=True)
