@@ -5,6 +5,7 @@ import pandas as pd
 FONDO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/fondo_eswaju.png"
 LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/logotipo_eswaju.png"
 
+
 # Fondo con CSS
 st.markdown(
     f"""
@@ -28,8 +29,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Logo centrado (corregido)
-st.markdown(f'<div style="text-align:center;"><img src="{LOGOTIPO_URL}" width="150"></div>', unsafe_allow_html=True)
+# Logo desde URL
+st.markdown(f'<div style="text-align:center;"><img src="{LOGO_URL}" width="150"></div>', unsafe_allow_html=True)
 
 # Título
 st.markdown('<div class="title">📘 Traductor ESWAJU: Awajún / Wampis – Español</div>', unsafe_allow_html=True)
@@ -64,3 +65,6 @@ if palabra:
             st.warning("❌ Palabra no encontrada en el diccionario.")
     else:
         st.error(f"❌ Columnas no válidas en el CSV: {columna_origen} o {columna_destino}")
+
+
+
