@@ -2,8 +2,9 @@ import streamlit as st
 import pandas as pd
 
 # Rutas desde GitHub
-FONDO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/fondo_eswaju.png"
-LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/logotipo_eswaju.png"
+FONDO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/fondo_eswaju.png"
+LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/logotipo_eswaju.png"
+
 
 
 # Fondo con CSS
