@@ -1,20 +1,16 @@
 import streamlit as st
 import pandas as pd
-import base64
-from PIL import Image
 
-# Función para convertir imagen a base64
-def imagen_a_base64(ruta):
-    with open(ruta, "rb") as f:
-        return base64.b64encode(f.read()).decode()
+# Rutas desde GitHub
+FONDO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/fondo_eswaju.png"
+LOGO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/logotipo_eswaju.png"
 
-# Establecer fondo desde imagen local convertida a base64
-fondo_base64 = imagen_a_base64("fondo_eswaju.png")
+# Fondo con CSS
 st.markdown(
     f"""
     <style>
     .stApp {{
-        background-image: url("data:image/png;base64,{fondo_base64}");
+        background-image: url("{FONDO_URL}");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -32,14 +28,13 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Mostrar logo local
-LOGO_URL = "https://raw.githubusercontent.com/mesiast01/MESIAS/main/logo_eswaju.png"
-st.image(LOGO_URL, width=150)
+# Logo desde URL
+st.markdown(f'<div style="text-align:center;"><img src="{LOGO_URL}" width="150"></div>', unsafe_allow_html=True)
 
 # Título
 st.markdown('<div class="title">📘 Traductor ESWAJU: Awajún / Wampis – Español</div>', unsafe_allow_html=True)
 
-# Cargar diccionario
+# Cargar CSV
 @st.cache_data
 def cargar_datos():
     df = pd.read_csv("diccionario.csv")
@@ -49,12 +44,11 @@ def cargar_datos():
 df = cargar_datos()
 
 # Interfaz
-st.markdown("\n")  # Espacio
 idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
 modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
 palabra = st.text_input("🔤 Ingresa una palabra:")
 
-# Lógica de traducción
+# Traducción
 if palabra:
     palabra_busqueda = palabra.strip().lower()
     idioma_key = "awajun" if idioma == "Awajún" else "wampis"
