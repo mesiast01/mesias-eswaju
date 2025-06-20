@@ -57,7 +57,7 @@ if authentication_status is False or authentication_status is None:
                 with open('config.yaml', 'w') as file:
                     yaml.dump(config, file, default_flow_style=False)
                 st.success("✅ Registrado exitosamente. Ahora inicia sesión.")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("❌ Por favor, completa todos los campos.")
 
