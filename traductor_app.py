@@ -36,10 +36,7 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=config['cookie']['expiry_days']
 )
 
-name, authentication_status, username = authenticator.login(
-    form_name='Iniciar sesión',
-    location='main'
-)
+name, authentication_status, username = authenticator.login('Iniciar sesión', 'main')
 
 if authentication_status is False or authentication_status is None:
     with st.expander("¿No tienes cuenta? Regístrate"):
