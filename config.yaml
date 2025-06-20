@@ -6,5 +6,3 @@ cookie:
   key: clave_secreta_eswaju
   expiry_days: 7
 
-preauthorized:
-  emails: []
