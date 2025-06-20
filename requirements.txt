@@ -1,5 +1,6 @@
 streamlit
 pandas
 pyyaml
-streamlit-authenticator>=0.2.3
+streamlit-authenticator==0.2.3
+
 
