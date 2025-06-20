@@ -4,6 +4,7 @@ import yaml
 import os
 import streamlit_authenticator as stauth
 from yaml.loader import SafeLoader
+from io import BytesIO  # 👈 Para generar Excel
 
 # ----------------------------
 # CREAR CONFIG.YAML SI NO EXISTE
@@ -41,7 +42,9 @@ name, authentication_status, username = authenticator.login(
     location='main'
 )
 
-
+# ----------------------------
+# REGISTRO DE USUARIO NUEVO
+# ----------------------------
 if authentication_status is False or authentication_status is None:
     with st.expander("¿No tienes cuenta? Regístrate"):
         new_email = st.text_input("Correo")
@@ -61,19 +64,47 @@ if authentication_status is False or authentication_status is None:
             else:
                 st.error("❌ Por favor, completa todos los campos.")
 
+# ----------------------------
+# APP PRINCIPAL (solo si hay sesión)
+# ----------------------------
 if authentication_status:
     authenticator.logout("Cerrar sesión", "sidebar")
     st.sidebar.success(f"Bienvenido, {name} 👋")
 
+    # 👥 Mostrar usuarios registrados solo si eres el admin
+    if username == "mtorres60036812@gmail.com":
+        st.sidebar.markdown("### 👥 Usuarios registrados")
+
+        usuarios = []
+        for correo, datos in config['credentials']['usernames'].items():
+            usuarios.append({"Correo": correo, "Nombre": datos['name']})
+            st.sidebar.write(f"📧 {correo} - {datos['name']}")
+
+        st.sidebar.info(f"🧾 Total registrados: {len(usuarios)}")
+
+        # Generar archivo Excel
+        df_usuarios = pd.DataFrame(usuarios)
+        excel_buffer = BytesIO()
+        with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+            df_usuarios.to_excel(writer, index=False, sheet_name='Usuarios')
+
+        # Botón de descarga
+        st.sidebar.download_button(
+            label="⬇️ Descargar usuarios (Excel)",
+            data=excel_buffer.getvalue(),
+            file_name="usuarios_eswaju.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
     # ----------------------------
-    # TU APP PRINCIPAL
+    # INTERFAZ PRINCIPAL DE LA APP
     # ----------------------------
 
-    # Rutas desde GitHub
+    # Imágenes desde GitHub
     FONDO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/fondo_eswaju.png"
     LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/logotipo_eswaju.png"
 
-    # Fondo con CSS
+    # Fondo visual
     st.markdown(
         f"""
         <style>
@@ -96,7 +127,7 @@ if authentication_status:
         unsafe_allow_html=True
     )
 
-    # Logo centrado con espacio inferior
+    # Logo
     st.markdown(
         f'''
         <div style="text-align:center; margin-top:20px; margin-bottom:30px;">
@@ -109,7 +140,10 @@ if authentication_status:
     # Título
     st.markdown('<div class="title">📘 Traductor ESWAJU: Awajún / Wampis – Español</div>', unsafe_allow_html=True)
 
-    # Cargar CSV
+    # ----------------------------
+    # FUNCIONALIDAD DE TRADUCCIÓN
+    # ----------------------------
+
     @st.cache_data
     def cargar_datos():
         df = pd.read_csv("diccionario.csv")
@@ -118,12 +152,10 @@ if authentication_status:
 
     df = cargar_datos()
 
-    # Interfaz
     idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
     modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
     palabra = st.text_input("🔤 Ingresa una palabra:")
 
-    # Traducción
     if palabra:
         palabra_busqueda = palabra.strip().lower()
         idioma_key = "awajun" if idioma == "Awajún" else "wampis"
