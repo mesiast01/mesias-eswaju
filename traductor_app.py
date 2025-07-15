@@ -138,7 +138,7 @@ if authentication_status:
     )
 
     # Título
-    st.markdown('<div class="title">📘 Traductor ESWAJU: Awajún / Wampis – Español</div>', unsafe_allow_html=True)
+    st.markdown('<div class="title">📘 Traductor ESWAJU: Español – Wampis / Awajún</div>', unsafe_allow_html=True)
 
     # ----------------------------
     # FUNCIONALIDAD DE TRADUCCIÓN
