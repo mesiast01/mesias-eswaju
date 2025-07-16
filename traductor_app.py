@@ -185,8 +185,8 @@ if authentication_status:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
 
     elif modo == "Lengua originaria → Español":
-    resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
-    resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
+         resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
+         resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
 
     if not resultado_awajun.empty or not resultado_wampis.empty:
         st.markdown("<h3 style='color:#000000;'>🔁 Traducción:</h3>", unsafe_allow_html=True)
