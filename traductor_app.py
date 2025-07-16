@@ -170,7 +170,7 @@ if authentication_status:
     palabra = st.text_input("🔤 Ingresa una palabra:")
 
     if palabra:
-    palabra_busqueda = palabra.strip().lower()
+         palabra_busqueda = palabra.strip().lower()
 
     if modo == "Español → Lengua originaria":
         idioma_key = "awajun" if idioma == "Awajún" else "wampis"
