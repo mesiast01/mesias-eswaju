@@ -152,7 +152,7 @@ if authentication_status:
 
     df = cargar_datos()
 
-        idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
+    idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
     modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
     palabra = st.text_input("🔤 Ingresa una palabra:")
 
