@@ -184,26 +184,26 @@ if authentication_status:
             else:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
 
-        elif modo == "Lengua originaria → Español":
-            resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
-            resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
+    elif modo == "Lengua originaria → Español":
+    resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
+    resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
 
-            if not resultado_awajun.empty or not resultado_wampis.empty:
-                st.markdown("<h3 style='color:#000000;'>🔁 Traducción:</h3>", unsafe_allow_html=True)
+    if not resultado_awajun.empty or not resultado_wampis.empty:
+        st.markdown("<h3 style='color:#000000;'>🔁 Traducción:</h3>", unsafe_allow_html=True)
 
-                if not resultado_awajun.empty:
-                    traduccion_awa = resultado_awajun.iloc[0]["espanol"]
-                    st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
-                    nombre_audio = f"{palabra_busqueda}_awajun.mp3"
-                    reproducir_audio(nombre_audio)
+        if not resultado_awajun.empty:
+            traduccion_awa = resultado_awajun.iloc[0]["espanol"]
+            st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
+            reproducir_audio(f"{traduccion_awa.lower()}_espanol.mp3")  # ✅ Reproducir el audio de la traducción
 
-                if not resultado_wampis.empty:
-                    traduccion_wam = resultado_wampis.iloc[0]["espanol"]
-                    st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
-                    nombre_audio = f"{palabra_busqueda}_wampis.mp3"
-                    reproducir_audio(nombre_audio)
-            else:
-                st.warning("❌ Palabra no encontrada en el diccionario.")
+        if not resultado_wampis.empty:
+            traduccion_wam = resultado_wampis.iloc[0]["espanol"]
+            st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
+            reproducir_audio(f"{traduccion_wam.lower()}_espanol.mp3")  # ✅ Reproducir el audio de la traducción
+
+    else:
+        st.warning("❌ Palabra no encontrada en el diccionario.")
+
 
 
 
