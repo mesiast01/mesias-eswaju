@@ -152,25 +152,38 @@ if authentication_status:
 
     df = cargar_datos()
 
-    idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
+        idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
     modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
     palabra = st.text_input("🔤 Ingresa una palabra:")
 
     if palabra:
         palabra_busqueda = palabra.strip().lower()
-        idioma_key = "awajun" if idioma == "Awajún" else "wampis"
-        columna_origen = "espanol" if "Español" in modo else idioma_key
-        columna_destino = idioma_key if "Español" in modo else "espanol"
 
-        if columna_origen in df.columns and columna_destino in df.columns:
-            resultado = df[df[columna_origen].str.lower() == palabra_busqueda]
+        if modo == "Español → Lengua originaria":
+            idioma_key = "awajun" if idioma == "Awajún" else "wampis"
+            resultado = df[df["espanol"].str.lower() == palabra_busqueda]
+
             if not resultado.empty:
-                traduccion = resultado.iloc[0][columna_destino]
+                traduccion = resultado.iloc[0][idioma_key]
                 st.markdown(f"<h3 style='color:#000000;'>🔁 Traducción: {traduccion}</h3>", unsafe_allow_html=True)
             else:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
-        else:
-            st.error(f"❌ Columnas no válidas en el CSV: {columna_origen} o {columna_destino}")
+
+        elif modo == "Lengua originaria → Español":
+            resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
+            resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
+
+            if not resultado_awajun.empty or not resultado_wampis.empty:
+                st.markdown("<h3 style='color:#000000;'>🔁 Traducción:</h3>", unsafe_allow_html=True)
+                if not resultado_awajun.empty:
+                    traduccion_awa = resultado_awajun.iloc[0]["espanol"]
+                    st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
+                if not resultado_wampis.empty:
+                    traduccion_wam = resultado_wampis.iloc[0]["espanol"]
+                    st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
+            else:
+                st.warning("❌ Palabra no encontrada en el diccionario.")
+
 
 
 
