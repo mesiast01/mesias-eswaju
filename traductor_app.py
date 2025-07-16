@@ -194,15 +194,16 @@ if authentication_status:
         if not resultado_awajun.empty:
             traduccion_awa = resultado_awajun.iloc[0]["espanol"]
             st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
-            reproducir_audio(f"{traduccion_awa.lower()}_espanol.mp3")  # ✅ Reproducir el audio de la traducción
+            reproducir_audio(f"{traduccion_awa.lower()}_espanol.mp3")  # ✅
 
         if not resultado_wampis.empty:
             traduccion_wam = resultado_wampis.iloc[0]["espanol"]
             st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
-            reproducir_audio(f"{traduccion_wam.lower()}_espanol.mp3")  # ✅ Reproducir el audio de la traducción
+            reproducir_audio(f"{traduccion_wam.lower()}_espanol.mp3")  # ✅
 
     else:
         st.warning("❌ Palabra no encontrada en el diccionario.")
+
 
 
 
