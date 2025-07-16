@@ -4,11 +4,8 @@ import yaml
 import os
 import streamlit_authenticator as stauth
 from yaml.loader import SafeLoader
-from io import BytesIO  # Para generar Excel
+from io import BytesIO
 
-# ----------------------------
-# CREAR CONFIG.YAML SI NO EXISTE
-# ----------------------------
 if not os.path.exists("config.yaml"):
     with open("config.yaml", "w") as f:
         f.write("""
@@ -24,9 +21,6 @@ preauthorized:
   emails: []
 """)
 
-# ----------------------------
-# AUTENTICACIÓN
-# ----------------------------
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
 
@@ -42,9 +36,6 @@ name, authentication_status, username = authenticator.login(
     location='main'
 )
 
-# ----------------------------
-# REGISTRO DE USUARIO NUEVO
-# ----------------------------
 if authentication_status is False or authentication_status is None:
     with st.expander("¿No tienes cuenta? Regístrate"):
         new_email = st.text_input("Correo")
@@ -64,9 +55,6 @@ if authentication_status is False or authentication_status is None:
             else:
                 st.error("❌ Por favor, completa todos los campos.")
 
-# ----------------------------
-# FUNCIÓN PARA REPRODUCIR AUDIO
-# ----------------------------
 def reproducir_audio(nombre_archivo):
     ruta = os.path.join("audios", nombre_archivo)
     if os.path.exists(ruta):
@@ -74,27 +62,21 @@ def reproducir_audio(nombre_archivo):
     else:
         st.info("🔇 No hay audio disponible para esta palabra.")
 
-# ----------------------------
-# APP PRINCIPAL (solo si hay sesión)
-# ----------------------------
 if authentication_status:
     authenticator.logout("Cerrar sesión", "sidebar")
     st.sidebar.success(f"Bienvenido, {name} 👋")
 
-    # Mostrar usuarios registrados solo si eres el admin
     if username == "mtorres60036812@gmail.com":
         st.sidebar.markdown("### 👥 Usuarios registrados")
         usuarios = []
         for correo, datos in config['credentials']['usernames'].items():
             usuarios.append({"Correo": correo, "Nombre": datos['name']})
             st.sidebar.write(f"📧 {correo} - {datos['name']}")
-
         st.sidebar.info(f"🧾 Total registrados: {len(usuarios)}")
         df_usuarios = pd.DataFrame(usuarios)
         excel_buffer = BytesIO()
         with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
             df_usuarios.to_excel(writer, index=False, sheet_name='Usuarios')
-
         st.sidebar.download_button(
             label="⬇️ Descargar usuarios (Excel)",
             data=excel_buffer.getvalue(),
@@ -102,9 +84,6 @@ if authentication_status:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-    # ----------------------------
-    # INTERFAZ PRINCIPAL DE LA APP
-    # ----------------------------
     FONDO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/fondo_eswaju.png"
     LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/logotipo_eswaju.png"
 
@@ -177,14 +156,15 @@ if authentication_status:
                 if not resultado_awajun.empty:
                     traduccion_awa = resultado_awajun.iloc[0]["espanol"]
                     st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
-                    reproducir_audio(f"{traduccion_awa.lower()}_espanol.mp3")
+                    reproducir_audio(f"{palabra_busqueda}_awajun.mp3")
 
                 if not resultado_wampis.empty:
                     traduccion_wam = resultado_wampis.iloc[0]["espanol"]
                     st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
-                    reproducir_audio(f"{traduccion_wam.lower()}_espanol.mp3")
+                    reproducir_audio(f"{palabra_busqueda}_wampis.mp3")
             else:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
+
 
 
 
