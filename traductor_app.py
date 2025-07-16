@@ -188,21 +188,21 @@ if authentication_status:
          resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
          resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
 
-    if not resultado_awajun.empty or not resultado_wampis.empty:
-        st.markdown("<h3 style='color:#000000;'>🔁 Traducción:</h3>", unsafe_allow_html=True)
+         if not resultado_awajun.empty or not resultado_wampis.empty:
+             st.markdown("<h3 style='color:#000000;'>🔁 Traducción:</h3>", unsafe_allow_html=True)
 
-        if not resultado_awajun.empty:
-            traduccion_awa = resultado_awajun.iloc[0]["espanol"]
-            st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
-            reproducir_audio(f"{traduccion_awa.lower()}_espanol.mp3")  # ✅
+             if not resultado_awajun.empty:
+                 traduccion_awa = resultado_awajun.iloc[0]["espanol"]
+                 st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
+                 reproducir_audio(f"{traduccion_awa.lower()}_espanol.mp3")  # ✅
 
-        if not resultado_wampis.empty:
-            traduccion_wam = resultado_wampis.iloc[0]["espanol"]
-            st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
-            reproducir_audio(f"{traduccion_wam.lower()}_espanol.mp3")  # ✅
+             if not resultado_wampis.empty:
+                 traduccion_wam = resultado_wampis.iloc[0]["espanol"]
+                 st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
+                 reproducir_audio(f"{traduccion_wam.lower()}_espanol.mp3")  # ✅
 
-    else:
-        st.warning("❌ Palabra no encontrada en el diccionario.")
+         else:
+             st.warning("❌ Palabra no encontrada en el diccionario.")
 
 
 
