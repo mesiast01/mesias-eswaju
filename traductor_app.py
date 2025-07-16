@@ -4,7 +4,7 @@ import yaml
 import os
 import streamlit_authenticator as stauth
 from yaml.loader import SafeLoader
-from io import BytesIO  # 👈 Para generar Excel
+from io import BytesIO  # Para generar Excel
 
 # ----------------------------
 # CREAR CONFIG.YAML SI NO EXISTE
@@ -71,7 +71,7 @@ if authentication_status:
     authenticator.logout("Cerrar sesión", "sidebar")
     st.sidebar.success(f"Bienvenido, {name} 👋")
 
-    # 👥 Mostrar usuarios registrados solo si eres el admin
+    # Mostrar usuarios registrados solo si eres el admin
     if username == "mtorres60036812@gmail.com":
         st.sidebar.markdown("### 👥 Usuarios registrados")
 
@@ -141,7 +141,7 @@ if authentication_status:
     st.markdown('<div class="title">📘 Traductor ESWAJU: Español – Wampis / Awajún</div>', unsafe_allow_html=True)
 
     # ----------------------------
-    # FUNCIONALIDAD DE TRADUCCIÓN
+    # FUNCIONES
     # ----------------------------
 
     @st.cache_data
@@ -149,6 +149,19 @@ if authentication_status:
         df = pd.read_csv("diccionario.csv")
         df.columns = df.columns.str.strip().str.lower()
         return df
+
+    def reproducir_audio(nombre_archivo):
+        ruta_audio = os.path.join("audios", nombre_archivo)
+        if os.path.exists(ruta_audio):
+            with open(ruta_audio, "rb") as audio_file:
+                audio_bytes = audio_file.read()
+                st.audio(audio_bytes, format="audio/mp3")
+        else:
+            st.info("🔇 No hay audio disponible para esta palabra.")
+
+    # ----------------------------
+    # TRADUCCIÓN
+    # ----------------------------
 
     df = cargar_datos()
 
@@ -166,6 +179,8 @@ if authentication_status:
             if not resultado.empty:
                 traduccion = resultado.iloc[0][idioma_key]
                 st.markdown(f"<h3 style='color:#000000;'>🔁 Traducción: {traduccion}</h3>", unsafe_allow_html=True)
+                nombre_audio = f"{traduccion.lower()}_{idioma_key}.mp3"
+                reproducir_audio(nombre_audio)
             else:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
 
@@ -175,14 +190,21 @@ if authentication_status:
 
             if not resultado_awajun.empty or not resultado_wampis.empty:
                 st.markdown("<h3 style='color:#000000;'>🔁 Traducción:</h3>", unsafe_allow_html=True)
+
                 if not resultado_awajun.empty:
                     traduccion_awa = resultado_awajun.iloc[0]["espanol"]
                     st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
+                    nombre_audio = f"{palabra_busqueda}_awajun.mp3"
+                    reproducir_audio(nombre_audio)
+
                 if not resultado_wampis.empty:
                     traduccion_wam = resultado_wampis.iloc[0]["espanol"]
                     st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
+                    nombre_audio = f"{palabra_busqueda}_wampis.mp3"
+                    reproducir_audio(nombre_audio)
             else:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
+
 
 
 
