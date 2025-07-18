@@ -173,18 +173,25 @@ if authentication_status:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
 
         elif modo == "Lengua originaria → Español":
-    idioma_key = "awajun" if idioma == "Awajún" else "wampis"
-    resultado = df[df[idioma_key].str.lower() == palabra_busqueda]
+            resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
+            resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
 
-    if not resultado.empty:
-        traduccion = resultado.iloc[0]["espanol"]
-        st.markdown(f"🔁 **Traducción:**")
-        st.write(f"🗣️ {idioma} → Español: {traduccion}")
-        nombre_audio = f"{palabra_busqueda}_{idioma_key}.mp3"
-        reproducir_audio(nombre_audio)
-    else:
-        st.warning(f"❌ La palabra no se encontró en el idioma seleccionado: {idioma}.")
+            if not resultado_awajun.empty or not resultado_wampis.empty:
+                st.markdown("🔁 **Traducción:**")
 
+                if not resultado_awajun.empty:
+                    traduccion_awa = resultado_awajun.iloc[0]["espanol"]
+                    st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
+                    nombre_audio = f"{palabra_busqueda}_awajun.mp3"
+                    reproducir_audio(nombre_audio)
+
+                if not resultado_wampis.empty:
+                    traduccion_wam = resultado_wampis.iloc[0]["espanol"]
+                    st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
+                    nombre_audio = f"{palabra_busqueda}_wampis.mp3"
+                    reproducir_audio(nombre_audio)
+            else:
+                st.warning("❌ Palabra no encontrada en el diccionario.")
 
 
 
