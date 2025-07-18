@@ -7,37 +7,29 @@ from yaml.loader import SafeLoader
 from io import BytesIO  # Para generar Excel
 
 # ----------------------------
-# ARCHIVO DE USUARIOS
+# CREAR CONFIG.YAML SI NO EXISTE
 # ----------------------------
-USUARIOS_FILE = "usuarios.yaml"
+if not os.path.exists("config.yaml"):
+    with open("config.yaml", "w") as f:
+        f.write("""
+credentials:
+  usernames: {}
 
-if not os.path.exists(USUARIOS_FILE):
-    with open(USUARIOS_FILE, "w") as f:
-        yaml.dump({"usernames": {}}, f)
+cookie:
+  name: eswaju_cookie
+  key: clave_secreta_eswaju
+  expiry_days: 7
 
-# ----------------------------
-# CARGAR DATOS DE USUARIOS
-# ----------------------------
-with open(USUARIOS_FILE, "r") as f:
-    usuarios_data = yaml.safe_load(f)
-
-config = {
-    'credentials': {
-        'usernames': usuarios_data['usernames']
-    },
-    'cookie': {
-        'name': 'eswaju_cookie',
-        'key': 'clave_secreta_eswaju',
-        'expiry_days': 7
-    },
-    'preauthorized': {
-        'emails': []
-    }
-}
+preauthorized:
+  emails: []
+""")
 
 # ----------------------------
 # AUTENTICACIÓN
 # ----------------------------
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
 authenticator = stauth.Authenticate(
     credentials=config['credentials'],
     cookie_name=config['cookie']['name'],
@@ -61,41 +53,41 @@ if authentication_status is False or authentication_status is None:
         if st.button("Registrarse"):
             if new_email and new_name and new_password:
                 hashed_pw = stauth.Hasher([new_password]).generate()[0]
-
-                usuarios_data['usernames'][new_email] = {
+                config['credentials']['usernames'][new_email] = {
                     'name': new_name,
                     'password': hashed_pw
                 }
-
-                with open(USUARIOS_FILE, 'w') as f:
-                    yaml.dump(usuarios_data, f)
-
+                with open('config.yaml', 'w') as file:
+                    yaml.dump(config, file, default_flow_style=False)
                 st.success("✅ Registrado exitosamente. Ahora inicia sesión.")
                 st.rerun()
             else:
                 st.error("❌ Por favor, completa todos los campos.")
 
 # ----------------------------
-# APP PRINCIPAL
+# APP PRINCIPAL (solo si hay sesión)
 # ----------------------------
 if authentication_status:
     authenticator.logout("Cerrar sesión", "sidebar")
     st.sidebar.success(f"Bienvenido, {name} 👋")
 
-    # Admin: mostrar usuarios
+    # Mostrar usuarios registrados solo si eres el admin
     if username == "mtorres60036812@gmail.com":
         st.sidebar.markdown("### 👥 Usuarios registrados")
+
         usuarios = []
-        for correo, datos in usuarios_data['usernames'].items():
+        for correo, datos in config['credentials']['usernames'].items():
             usuarios.append({"Correo": correo, "Nombre": datos['name']})
             st.sidebar.write(f"📧 {correo} - {datos['name']}")
+
         st.sidebar.info(f"🧾 Total registrados: {len(usuarios)}")
 
-        # Descargar en Excel
+        # Generar archivo Excel
         df_usuarios = pd.DataFrame(usuarios)
         excel_buffer = BytesIO()
         with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
             df_usuarios.to_excel(writer, index=False, sheet_name='Usuarios')
+
         st.sidebar.download_button(
             label="⬇️ Descargar usuarios (Excel)",
             data=excel_buffer.getvalue(),
@@ -104,8 +96,10 @@ if authentication_status:
         )
 
     # ----------------------------
-    # FONDO Y LOGO
+    # INTERFAZ PRINCIPAL DE LA APP
     # ----------------------------
+
+    # Imágenes desde GitHub
     FONDO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/fondo_eswaju.png"
     LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/logotipo_eswaju.png"
 
@@ -117,14 +111,6 @@ if authentication_status:
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-        }}
-        .title {{
-            font-size: 32px;
-            font-weight: bold;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px #000000;
-            text-align: center;
-            margin-top: 10px;
         }}
         </style>
         """,
@@ -140,7 +126,7 @@ if authentication_status:
         unsafe_allow_html=True
     )
 
-    st.markdown('<div class="title">📘 Traductor ESWAJU: Español – Wampis / Awajún</div>', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align:center; color:white;">📘 Traductor ESWAJU: Español – Wampis / Awajún</h2>', unsafe_allow_html=True)
 
     # ----------------------------
     # FUNCIONES
@@ -156,13 +142,15 @@ if authentication_status:
         if os.path.exists(ruta_audio):
             with open(ruta_audio, "rb") as audio_file:
                 audio_bytes = audio_file.read()
+                st.markdown("🔊 **Pronunciación:**")
                 st.audio(audio_bytes, format="audio/mp3")
         else:
             st.info("🔇 No hay audio disponible para esta palabra.")
 
     # ----------------------------
-    # TRADUCCIÓN MEJORADA
+    # TRADUCCIÓN
     # ----------------------------
+
     df = cargar_datos()
 
     idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
@@ -178,12 +166,7 @@ if authentication_status:
 
             if not resultado.empty:
                 traduccion = resultado.iloc[0][idioma_key]
-                st.markdown(f"""
-                    <div style='background-color:#f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);'>
-                        <h3 style='color:#000000;'>🔁 <b>Traducción:</b> {traduccion}</h3>
-                        <h4 style='color:#000000;'>🔊 <b>Pronunciación:</b></h4>
-                    </div>
-                """, unsafe_allow_html=True)
+                st.markdown(f"🔁 **Traducción:** {traduccion}")
                 nombre_audio = f"{traduccion.lower()}_{idioma_key}.mp3"
                 reproducir_audio(nombre_audio)
             else:
@@ -194,29 +177,22 @@ if authentication_status:
             resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
 
             if not resultado_awajun.empty or not resultado_wampis.empty:
+                st.markdown("🔁 **Traducción:**")
+
                 if not resultado_awajun.empty:
                     traduccion_awa = resultado_awajun.iloc[0]["espanol"]
-                    st.markdown(f"""
-                        <div style='background-color:#f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);'>
-                            <h4 style='color:#000000;'>🗣️ <b>Awajún → Español:</b> {traduccion_awa}</h4>
-                            <h5 style='color:#000000;'>🔊 <b>Pronunciación:</b></h5>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
                     nombre_audio = f"{palabra_busqueda}_awajun.mp3"
                     reproducir_audio(nombre_audio)
 
                 if not resultado_wampis.empty:
                     traduccion_wam = resultado_wampis.iloc[0]["espanol"]
-                    st.markdown(f"""
-                        <div style='background-color:#f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);'>
-                            <h4 style='color:#000000;'>🗣️ <b>Wampis → Español:</b> {traduccion_wam}</h4>
-                            <h5 style='color:#000000;'>🔊 <b>Pronunciación:</b></h5>
-                        </div>
-                    """, unsafe_allow_html=True)
+                    st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
                     nombre_audio = f"{palabra_busqueda}_wampis.mp3"
                     reproducir_audio(nombre_audio)
             else:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
+
 
 
 
