@@ -76,30 +76,26 @@ if authentication_status is False or authentication_status is None:
                 st.error("❌ Por favor, completa todos los campos.")
 
 # ----------------------------
-# APP PRINCIPAL (solo si hay sesión)
+# APP PRINCIPAL
 # ----------------------------
 if authentication_status:
     authenticator.logout("Cerrar sesión", "sidebar")
     st.sidebar.success(f"Bienvenido, {name} 👋")
 
-    # Mostrar usuarios registrados solo si eres el admin
+    # Admin: mostrar usuarios
     if username == "mtorres60036812@gmail.com":
         st.sidebar.markdown("### 👥 Usuarios registrados")
-
         usuarios = []
         for correo, datos in usuarios_data['usernames'].items():
             usuarios.append({"Correo": correo, "Nombre": datos['name']})
             st.sidebar.write(f"📧 {correo} - {datos['name']}")
-
         st.sidebar.info(f"🧾 Total registrados: {len(usuarios)}")
 
-        # Generar archivo Excel
+        # Descargar en Excel
         df_usuarios = pd.DataFrame(usuarios)
         excel_buffer = BytesIO()
         with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
             df_usuarios.to_excel(writer, index=False, sheet_name='Usuarios')
-
-        # Botón de descarga
         st.sidebar.download_button(
             label="⬇️ Descargar usuarios (Excel)",
             data=excel_buffer.getvalue(),
@@ -108,7 +104,7 @@ if authentication_status:
         )
 
     # ----------------------------
-    # INTERFAZ PRINCIPAL DE LA APP
+    # FONDO Y LOGO
     # ----------------------------
     FONDO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/fondo_eswaju.png"
     LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/logotipo_eswaju.png"
@@ -165,7 +161,7 @@ if authentication_status:
             st.info("🔇 No hay audio disponible para esta palabra.")
 
     # ----------------------------
-    # TRADUCCIÓN
+    # TRADUCCIÓN MEJORADA
     # ----------------------------
     df = cargar_datos()
 
@@ -182,7 +178,12 @@ if authentication_status:
 
             if not resultado.empty:
                 traduccion = resultado.iloc[0][idioma_key]
-                st.markdown(f"<h3 style='color:#000000;'>🔁 Traducción: {traduccion}</h3>", unsafe_allow_html=True)
+                st.markdown(f"""
+                    <div style='background-color:#f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);'>
+                        <h3 style='color:#000000;'>🔁 <b>Traducción:</b> {traduccion}</h3>
+                        <h4 style='color:#000000;'>🔊 <b>Pronunciación:</b></h4>
+                    </div>
+                """, unsafe_allow_html=True)
                 nombre_audio = f"{traduccion.lower()}_{idioma_key}.mp3"
                 reproducir_audio(nombre_audio)
             else:
@@ -193,21 +194,30 @@ if authentication_status:
             resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
 
             if not resultado_awajun.empty or not resultado_wampis.empty:
-                st.markdown("<h3 style='color:#000000;'>🔁 Traducción:</h3>", unsafe_allow_html=True)
-
                 if not resultado_awajun.empty:
                     traduccion_awa = resultado_awajun.iloc[0]["espanol"]
-                    st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
+                    st.markdown(f"""
+                        <div style='background-color:#f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);'>
+                            <h4 style='color:#000000;'>🗣️ <b>Awajún → Español:</b> {traduccion_awa}</h4>
+                            <h5 style='color:#000000;'>🔊 <b>Pronunciación:</b></h5>
+                        </div>
+                    """, unsafe_allow_html=True)
                     nombre_audio = f"{palabra_busqueda}_awajun.mp3"
                     reproducir_audio(nombre_audio)
 
                 if not resultado_wampis.empty:
                     traduccion_wam = resultado_wampis.iloc[0]["espanol"]
-                    st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
+                    st.markdown(f"""
+                        <div style='background-color:#f9f9f9; padding: 15px; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);'>
+                            <h4 style='color:#000000;'>🗣️ <b>Wampis → Español:</b> {traduccion_wam}</h4>
+                            <h5 style='color:#000000;'>🔊 <b>Pronunciación:</b></h5>
+                        </div>
+                    """, unsafe_allow_html=True)
                     nombre_audio = f"{palabra_busqueda}_wampis.mp3"
                     reproducir_audio(nombre_audio)
             else:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
+
 
 
 
