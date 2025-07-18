@@ -183,7 +183,7 @@ if authentication_status:
                      st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
                      nombre_audio = f"{palabra_busqueda}_awajun.mp3"
                      reproducir_audio(nombre_audio)
-                else:
+                 else:
                      st.warning("❌ La palabra no pertenece al idioma seleccionado (Awajún).")
 
              elif idioma == "Wampis":
