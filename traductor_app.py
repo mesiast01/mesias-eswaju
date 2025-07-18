@@ -7,29 +7,37 @@ from yaml.loader import SafeLoader
 from io import BytesIO  # Para generar Excel
 
 # ----------------------------
-# CREAR CONFIG.YAML SI NO EXISTE
+# ARCHIVO DE USUARIOS
 # ----------------------------
-if not os.path.exists("config.yaml"):
-    with open("config.yaml", "w") as f:
-        f.write("""
-credentials:
-  usernames: {}
+USUARIOS_FILE = "usuarios.yaml"
 
-cookie:
-  name: eswaju_cookie
-  key: clave_secreta_eswaju
-  expiry_days: 7
+if not os.path.exists(USUARIOS_FILE):
+    with open(USUARIOS_FILE, "w") as f:
+        yaml.dump({"usernames": {}}, f)
 
-preauthorized:
-  emails: []
-""")
+# ----------------------------
+# CARGAR DATOS DE USUARIOS
+# ----------------------------
+with open(USUARIOS_FILE, "r") as f:
+    usuarios_data = yaml.safe_load(f)
+
+config = {
+    'credentials': {
+        'usernames': usuarios_data['usernames']
+    },
+    'cookie': {
+        'name': 'eswaju_cookie',
+        'key': 'clave_secreta_eswaju',
+        'expiry_days': 7
+    },
+    'preauthorized': {
+        'emails': []
+    }
+}
 
 # ----------------------------
 # AUTENTICACIÓN
 # ----------------------------
-with open('config.yaml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
-
 authenticator = stauth.Authenticate(
     credentials=config['credentials'],
     cookie_name=config['cookie']['name'],
@@ -53,12 +61,15 @@ if authentication_status is False or authentication_status is None:
         if st.button("Registrarse"):
             if new_email and new_name and new_password:
                 hashed_pw = stauth.Hasher([new_password]).generate()[0]
-                config['credentials']['usernames'][new_email] = {
+
+                usuarios_data['usernames'][new_email] = {
                     'name': new_name,
                     'password': hashed_pw
                 }
-                with open('config.yaml', 'w') as file:
-                    yaml.dump(config, file, default_flow_style=False)
+
+                with open(USUARIOS_FILE, 'w') as f:
+                    yaml.dump(usuarios_data, f)
+
                 st.success("✅ Registrado exitosamente. Ahora inicia sesión.")
                 st.rerun()
             else:
@@ -76,7 +87,7 @@ if authentication_status:
         st.sidebar.markdown("### 👥 Usuarios registrados")
 
         usuarios = []
-        for correo, datos in config['credentials']['usernames'].items():
+        for correo, datos in usuarios_data['usernames'].items():
             usuarios.append({"Correo": correo, "Nombre": datos['name']})
             st.sidebar.write(f"📧 {correo} - {datos['name']}")
 
@@ -99,12 +110,9 @@ if authentication_status:
     # ----------------------------
     # INTERFAZ PRINCIPAL DE LA APP
     # ----------------------------
-
-    # Imágenes desde GitHub
     FONDO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/fondo_eswaju.png"
     LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/logotipo_eswaju.png"
 
-    # Fondo visual
     st.markdown(
         f"""
         <style>
@@ -127,7 +135,6 @@ if authentication_status:
         unsafe_allow_html=True
     )
 
-    # Logo
     st.markdown(
         f'''
         <div style="text-align:center; margin-top:20px; margin-bottom:30px;">
@@ -137,13 +144,11 @@ if authentication_status:
         unsafe_allow_html=True
     )
 
-    # Título
     st.markdown('<div class="title">📘 Traductor ESWAJU: Español – Wampis / Awajún</div>', unsafe_allow_html=True)
 
     # ----------------------------
     # FUNCIONES
     # ----------------------------
-
     @st.cache_data
     def cargar_datos():
         df = pd.read_csv("diccionario.csv")
@@ -162,7 +167,6 @@ if authentication_status:
     # ----------------------------
     # TRADUCCIÓN
     # ----------------------------
-
     df = cargar_datos()
 
     idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
@@ -204,6 +208,7 @@ if authentication_status:
                     reproducir_audio(nombre_audio)
             else:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
+
 
 
 
