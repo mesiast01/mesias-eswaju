@@ -173,29 +173,29 @@ if authentication_status:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
 
         elif modo == "Lengua originaria → Español":
+             resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
+             resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
+
              if idioma == "Awajún":
-                 resultado = df[df["awajun"].str.lower() == palabra]
-                 if not resultado.empty:
-                     traduccion = resultado.iloc[0]["espanol"]
-                     st.markdown("🔁 **Traducción:**")
-                     st.write(f"🗣️ Awajún → Español: {traduccion}")
-                     nombre_audio = f"{palabra}_awajun.mp3"
-                     st.markdown("🔊 **Pronunciación:**")
+                 if not resultado_awajun.empty:
+                     traduccion_awa = resultado_awajun.iloc[0]["espanol"]
+                     st.markdown(f"🔁 **Traducción:**")
+                     st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
+                     nombre_audio = f"{palabra_busqueda}_awajun.mp3"
                      reproducir_audio(nombre_audio)
-                 else:
+                else:
                      st.warning("❌ La palabra no pertenece al idioma seleccionado (Awajún).")
 
              elif idioma == "Wampis":
-                 resultado = df[df["wampis"].str.lower() == palabra]
-                 if not resultado.empty:
-                     traduccion = resultado.iloc[0]["espanol"]
-                     st.markdown("🔁 **Traducción:**")
-                     st.write(f"🗣️ Wampis → Español: {traduccion}")
-                     nombre_audio = f"{palabra}_wampis.mp3"
-                     st.markdown("🔊 **Pronunciación:**")
+                 if not resultado_wampis.empty:
+                     traduccion_wam = resultado_wampis.iloc[0]["espanol"]
+                     st.markdown(f"🔁 **Traducción:**")
+                     st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
+                     nombre_audio = f"{palabra_busqueda}_wampis.mp3"
                      reproducir_audio(nombre_audio)
                  else:
                      st.warning("❌ La palabra no pertenece al idioma seleccionado (Wampis).")
+
 
 
 
