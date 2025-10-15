@@ -134,13 +134,34 @@ if authentication_status:
 
     # ✅ NUEVA FUNCIÓN para leer Excel con varias hojas
     @st.cache_data
-    def cargar_datos():
-        # Si usas varias hojas en un Excel (diccionario.xlsx)
-        # se cargan todas y se combinan en un solo DataFrame
-        hojas = pd.read_excel("diccionario.xlsx", sheet_name=None)
-        df = pd.concat(hojas.values(), ignore_index=True)
-        df.columns = df.columns.str.strip().str.lower()
-        return df
+def cargar_datos():
+    try:
+        if os.path.exists("diccionario.xlsx"):
+            hojas = pd.read_excel("diccionario.xlsx", sheet_name=None, engine="openpyxl")
+            
+            # Verificamos que haya hojas válidas
+            if not hojas:
+                st.warning("⚠️ El archivo Excel no contiene hojas válidas. Cargando CSV.")
+                if os.path.exists("diccionario.csv"):
+                    df = pd.read_csv("diccionario.csv")
+                else:
+                    df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
+            else:
+                df = pd.concat(hojas.values(), ignore_index=True)
+                st.info("📘 Diccionario cargado desde Excel (con varias hojas).")
+        elif os.path.exists("diccionario.csv"):
+            df = pd.read_csv("diccionario.csv")
+            st.info("📄 Diccionario cargado desde CSV.")
+        else:
+            st.error("❌ No se encontró ningún diccionario disponible.")
+            df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
+    except Exception as e:
+        st.error(f"⚠️ Error al leer el diccionario: {e}")
+        df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
+
+    df.columns = df.columns.str.strip().str.lower()
+    return df
+
 
     def reproducir_audio(nombre_archivo):
         ruta_audio = os.path.join("audios", nombre_archivo)
