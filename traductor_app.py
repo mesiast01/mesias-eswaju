@@ -82,7 +82,7 @@ if authentication_status:
 
         st.sidebar.info(f"🧾 Total registrados: {len(usuarios)}")
 
-        # Generar archivo Excel con los usuarios
+        # Generar archivo Excel
         df_usuarios = pd.DataFrame(usuarios)
         excel_buffer = BytesIO()
         with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
@@ -132,31 +132,13 @@ if authentication_status:
     # FUNCIONES
     # ----------------------------
 
+    # ✅ NUEVA FUNCIÓN para leer Excel con varias hojas
     @st.cache_data
     def cargar_datos():
-        """
-        Carga el diccionario desde Excel (si tiene varias hojas)
-        o desde CSV como respaldo.
-        """
-        if os.path.exists("diccionario.xlsx"):
-            try:
-                hojas = pd.read_excel("diccionario.xlsx", sheet_name=None)
-                df = pd.concat(hojas.values(), ignore_index=True)
-                st.info("📘 Diccionario cargado desde Excel.")
-            except Exception as e:
-                st.warning(f"⚠️ Error al leer el Excel: {e}")
-                if os.path.exists("diccionario.csv"):
-                    df = pd.read_csv("diccionario.csv")
-                    st.info("📄 Cargando desde diccionario.csv.")
-                else:
-                    df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
-        elif os.path.exists("diccionario.csv"):
-            df = pd.read_csv("diccionario.csv")
-            st.info("📄 Diccionario cargado desde CSV.")
-        else:
-            st.error("❌ No se encontró ningún diccionario disponible.")
-            df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
-
+        # Si usas varias hojas en un Excel (diccionario.xlsx)
+        # se cargan todas y se combinan en un solo DataFrame
+        hojas = pd.read_excel("diccionario.xlsx", sheet_name=None)
+        df = pd.concat(hojas.values(), ignore_index=True)
         df.columns = df.columns.str.strip().str.lower()
         return df
 
@@ -173,7 +155,8 @@ if authentication_status:
     # ----------------------------
     # TRADUCCIÓN
     # ----------------------------
-    df = cargar_datos()
+
+    df = cargar_datos()  # 🔁 ahora carga el Excel con varias hojas
 
     idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
     modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
@@ -184,31 +167,39 @@ if authentication_status:
 
         if modo == "Español → Lengua originaria":
             idioma_key = "awajun" if idioma == "Awajún" else "wampis"
-            if "espanol" in df.columns and idioma_key in df.columns:
-                resultado = df[df["espanol"].str.lower() == palabra_busqueda]
-                if not resultado.empty:
-                    traduccion = resultado.iloc[0][idioma_key]
-                    st.markdown(f"🔁 **Traducción:** {traduccion}")
-                    nombre_audio = f"{traduccion.lower()}_{idioma_key}.mp3"
-                    reproducir_audio(nombre_audio)
-                else:
-                    st.warning("❌ Palabra no encontrada en el diccionario.")
+            resultado = df[df["espanol"].str.lower() == palabra_busqueda]
+
+            if not resultado.empty:
+                traduccion = resultado.iloc[0][idioma_key]
+                st.markdown(f"🔁 **Traducción:** {traduccion}")
+                nombre_audio = f"{traduccion.lower()}_{idioma_key}.mp3"
+                reproducir_audio(nombre_audio)
             else:
-                st.error("⚠️ Las columnas esperadas no existen en el archivo de datos.")
+                st.warning("❌ Palabra no encontrada en el diccionario.")
 
         elif modo == "Lengua originaria → Español":
-            idioma_key = "awajun" if idioma == "Awajún" else "wampis"
-            if idioma_key in df.columns and "espanol" in df.columns:
-                resultado = df[df[idioma_key].str.lower() == palabra_busqueda]
-                if not resultado.empty:
-                    traduccion = resultado.iloc[0]["espanol"]
-                    st.markdown(f"🔁 **Traducción:** {traduccion}")
-                    nombre_audio = f"{palabra_busqueda}_{idioma_key}.mp3"
+            resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
+            resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
+
+            if idioma == "Awajún":
+                if not resultado_awajun.empty:
+                    traduccion_awa = resultado_awajun.iloc[0]["espanol"]
+                    st.markdown(f"🔁 **Traducción:**")
+                    st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
+                    nombre_audio = f"{palabra_busqueda}_awajun.mp3"
                     reproducir_audio(nombre_audio)
                 else:
-                    st.warning("❌ Palabra no encontrada en el idioma seleccionado.")
-            else:
-                st.error("⚠️ Las columnas esperadas no existen en el archivo de datos.")
+                    st.warning("❌ La palabra no pertenece al idioma seleccionado (Awajún).")
+
+            elif idioma == "Wampis":
+                if not resultado_wampis.empty:
+                    traduccion_wam = resultado_wampis.iloc[0]["espanol"]
+                    st.markdown(f"🔁 **Traducción:**")
+                    st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
+                    nombre_audio = f"{palabra_busqueda}_wampis.mp3"
+                    reproducir_audio(nombre_audio)
+                else:
+                    st.warning("❌ La palabra no pertenece al idioma seleccionado (Wampis).")
 
 
 
