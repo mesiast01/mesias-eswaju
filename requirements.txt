@@ -3,5 +3,6 @@ pandas
 pyyaml
 streamlit-authenticator==0.2.3
 xlsxwriter
+openpyxl
 
 
