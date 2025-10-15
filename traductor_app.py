@@ -130,22 +130,28 @@ if authentication_status:
     # FUNCIONES
     # ----------------------------
 
+    # ✅ FUNCIÓN CORREGIDA PARA LEER EXCEL CON VARIAS HOJAS
     @st.cache_data
     def cargar_datos():
         try:
             if os.path.exists("diccionario.xlsx"):
-                hojas = pd.read_excel("diccionario.xlsx", sheet_name=None, engine="openpyxl")
+                archivo_excel = pd.ExcelFile("diccionario.xlsx", engine="openpyxl")
+                hojas = archivo_excel.sheet_names
 
-                # Verificar que haya hojas válidas
                 if not hojas:
-                    st.warning("⚠️ El archivo Excel no contiene hojas válidas. Cargando CSV.")
+                    st.warning("⚠️ El archivo Excel no contiene hojas válidas. Se cargará el CSV si existe.")
                     if os.path.exists("diccionario.csv"):
                         df = pd.read_csv("diccionario.csv")
                     else:
                         df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
                 else:
-                    df = pd.concat(hojas.values(), ignore_index=True)
-                    st.info("📘 Diccionario cargado desde Excel (con varias hojas).")
+                    lista_dfs = []
+                    for hoja in hojas:
+                        temp = pd.read_excel(archivo_excel, sheet_name=hoja)
+                        if not temp.empty:
+                            lista_dfs.append(temp)
+                    df = pd.concat(lista_dfs, ignore_index=True)
+                    st.info(f"📘 Diccionario cargado desde Excel ({len(hojas)} hojas combinadas).")
 
             elif os.path.exists("diccionario.csv"):
                 df = pd.read_csv("diccionario.csv")
@@ -161,6 +167,7 @@ if authentication_status:
         df.columns = df.columns.str.strip().str.lower()
         return df
 
+    # 🔊 Reproducir audio
     def reproducir_audio(nombre_archivo):
         ruta_audio = os.path.join("audios", nombre_archivo)
         if os.path.exists(ruta_audio):
@@ -174,7 +181,7 @@ if authentication_status:
     # ----------------------------
     # TRADUCCIÓN
     # ----------------------------
-    df = cargar_datos()  # 🔁 carga el Excel con varias hojas
+    df = cargar_datos()
 
     idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
     modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
@@ -218,6 +225,7 @@ if authentication_status:
                     reproducir_audio(nombre_audio)
                 else:
                     st.warning("❌ La palabra no pertenece al idioma seleccionado (Wampis).")
+
 
 
 
