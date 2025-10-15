@@ -131,9 +131,14 @@ if authentication_status:
     # ----------------------------
     # FUNCIONES
     # ----------------------------
+
+    # ✅ NUEVA FUNCIÓN para leer Excel con varias hojas
     @st.cache_data
     def cargar_datos():
-        df = pd.read_csv("diccionario.csv")
+        # Si usas varias hojas en un Excel (diccionario.xlsx)
+        # se cargan todas y se combinan en un solo DataFrame
+        hojas = pd.read_excel("diccionario.xlsx", sheet_name=None)
+        df = pd.concat(hojas.values(), ignore_index=True)
         df.columns = df.columns.str.strip().str.lower()
         return df
 
@@ -151,7 +156,7 @@ if authentication_status:
     # TRADUCCIÓN
     # ----------------------------
 
-    df = cargar_datos()
+    df = cargar_datos()  # 🔁 ahora carga el Excel con varias hojas
 
     idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
     modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
@@ -173,28 +178,29 @@ if authentication_status:
                 st.warning("❌ Palabra no encontrada en el diccionario.")
 
         elif modo == "Lengua originaria → Español":
-             resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
-             resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
+            resultado_awajun = df[df["awajun"].str.lower() == palabra_busqueda]
+            resultado_wampis = df[df["wampis"].str.lower() == palabra_busqueda]
 
-             if idioma == "Awajún":
-                 if not resultado_awajun.empty:
-                     traduccion_awa = resultado_awajun.iloc[0]["espanol"]
-                     st.markdown(f"🔁 **Traducción:**")
-                     st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
-                     nombre_audio = f"{palabra_busqueda}_awajun.mp3"
-                     reproducir_audio(nombre_audio)
-                 else:
-                     st.warning("❌ La palabra no pertenece al idioma seleccionado (Awajún).")
+            if idioma == "Awajún":
+                if not resultado_awajun.empty:
+                    traduccion_awa = resultado_awajun.iloc[0]["espanol"]
+                    st.markdown(f"🔁 **Traducción:**")
+                    st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
+                    nombre_audio = f"{palabra_busqueda}_awajun.mp3"
+                    reproducir_audio(nombre_audio)
+                else:
+                    st.warning("❌ La palabra no pertenece al idioma seleccionado (Awajún).")
 
-             elif idioma == "Wampis":
-                 if not resultado_wampis.empty:
-                     traduccion_wam = resultado_wampis.iloc[0]["espanol"]
-                     st.markdown(f"🔁 **Traducción:**")
-                     st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
-                     nombre_audio = f"{palabra_busqueda}_wampis.mp3"
-                     reproducir_audio(nombre_audio)
-                 else:
-                     st.warning("❌ La palabra no pertenece al idioma seleccionado (Wampis).")
+            elif idioma == "Wampis":
+                if not resultado_wampis.empty:
+                    traduccion_wam = resultado_wampis.iloc[0]["espanol"]
+                    st.markdown(f"🔁 **Traducción:**")
+                    st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
+                    nombre_audio = f"{palabra_busqueda}_wampis.mp3"
+                    reproducir_audio(nombre_audio)
+                else:
+                    st.warning("❌ La palabra no pertenece al idioma seleccionado (Wampis).")
+
 
 
 
