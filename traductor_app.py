@@ -98,8 +98,6 @@ if authentication_status:
     # ----------------------------
     # INTERFAZ PRINCIPAL DE LA APP
     # ----------------------------
-
-    # Imágenes desde GitHub
     FONDO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/fondo_eswaju.png"
     LOGOTIPO_URL = "https://raw.githubusercontent.com/mesiast01/mesias-eswaju/main/logotipo_eswaju.png"
 
@@ -132,36 +130,36 @@ if authentication_status:
     # FUNCIONES
     # ----------------------------
 
-    # ✅ NUEVA FUNCIÓN para leer Excel con varias hojas
     @st.cache_data
-def cargar_datos():
-    try:
-        if os.path.exists("diccionario.xlsx"):
-            hojas = pd.read_excel("diccionario.xlsx", sheet_name=None, engine="openpyxl")
-            
-            # Verificamos que haya hojas válidas
-            if not hojas:
-                st.warning("⚠️ El archivo Excel no contiene hojas válidas. Cargando CSV.")
-                if os.path.exists("diccionario.csv"):
-                    df = pd.read_csv("diccionario.csv")
+    def cargar_datos():
+        try:
+            if os.path.exists("diccionario.xlsx"):
+                hojas = pd.read_excel("diccionario.xlsx", sheet_name=None, engine="openpyxl")
+
+                # Verificar que haya hojas válidas
+                if not hojas:
+                    st.warning("⚠️ El archivo Excel no contiene hojas válidas. Cargando CSV.")
+                    if os.path.exists("diccionario.csv"):
+                        df = pd.read_csv("diccionario.csv")
+                    else:
+                        df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
                 else:
-                    df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
+                    df = pd.concat(hojas.values(), ignore_index=True)
+                    st.info("📘 Diccionario cargado desde Excel (con varias hojas).")
+
+            elif os.path.exists("diccionario.csv"):
+                df = pd.read_csv("diccionario.csv")
+                st.info("📄 Diccionario cargado desde CSV.")
             else:
-                df = pd.concat(hojas.values(), ignore_index=True)
-                st.info("📘 Diccionario cargado desde Excel (con varias hojas).")
-        elif os.path.exists("diccionario.csv"):
-            df = pd.read_csv("diccionario.csv")
-            st.info("📄 Diccionario cargado desde CSV.")
-        else:
-            st.error("❌ No se encontró ningún diccionario disponible.")
+                st.error("❌ No se encontró ningún diccionario disponible.")
+                df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
+
+        except Exception as e:
+            st.error(f"⚠️ Error al leer el diccionario: {e}")
             df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
-    except Exception as e:
-        st.error(f"⚠️ Error al leer el diccionario: {e}")
-        df = pd.DataFrame(columns=["espanol", "awajun", "wampis"])
 
-    df.columns = df.columns.str.strip().str.lower()
-    return df
-
+        df.columns = df.columns.str.strip().str.lower()
+        return df
 
     def reproducir_audio(nombre_archivo):
         ruta_audio = os.path.join("audios", nombre_archivo)
@@ -176,8 +174,7 @@ def cargar_datos():
     # ----------------------------
     # TRADUCCIÓN
     # ----------------------------
-
-    df = cargar_datos()  # 🔁 ahora carga el Excel con varias hojas
+    df = cargar_datos()  # 🔁 carga el Excel con varias hojas
 
     idioma = st.selectbox("🌐 Selecciona el idioma de destino:", ["Awajún", "Wampis"])
     modo = st.radio("🧭 Modo de traducción:", ["Español → Lengua originaria", "Lengua originaria → Español"])
@@ -205,7 +202,7 @@ def cargar_datos():
             if idioma == "Awajún":
                 if not resultado_awajun.empty:
                     traduccion_awa = resultado_awajun.iloc[0]["espanol"]
-                    st.markdown(f"🔁 **Traducción:**")
+                    st.markdown("🔁 **Traducción:**")
                     st.write(f"🗣️ Awajún → Español: {traduccion_awa}")
                     nombre_audio = f"{palabra_busqueda}_awajun.mp3"
                     reproducir_audio(nombre_audio)
@@ -215,12 +212,13 @@ def cargar_datos():
             elif idioma == "Wampis":
                 if not resultado_wampis.empty:
                     traduccion_wam = resultado_wampis.iloc[0]["espanol"]
-                    st.markdown(f"🔁 **Traducción:**")
+                    st.markdown("🔁 **Traducción:**")
                     st.write(f"🗣️ Wampis → Español: {traduccion_wam}")
                     nombre_audio = f"{palabra_busqueda}_wampis.mp3"
                     reproducir_audio(nombre_audio)
                 else:
                     st.warning("❌ La palabra no pertenece al idioma seleccionado (Wampis).")
+
 
 
 
